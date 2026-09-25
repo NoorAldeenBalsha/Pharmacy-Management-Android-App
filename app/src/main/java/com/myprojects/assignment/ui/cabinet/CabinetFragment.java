@@ -1,18 +1,23 @@
 package com.myprojects.assignment.ui.cabinet;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.myprojects.assignment.DataBaseHelper;
 import com.myprojects.assignment.R;
 import com.myprojects.assignment.adapter.CardAdapter;
 import com.myprojects.assignment.databinding.FragmentHomeBinding;
@@ -20,23 +25,52 @@ import com.myprojects.assignment.features.CardData;
 import com.myprojects.assignment.adapter.CardNavigation;
 import com.myprojects.assignment.ui.edit.EditCardFragment;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class CabinetFragment extends Fragment implements CardNavigation {
 
     private FragmentHomeBinding binding;
     private Context context;
+    List<String> pharmaceuticals_type_medication;
+    Set<String> pharmaceuticals_type_medication_Set;
+    String PH_Type;
 
-
+    public CabinetFragment(String PH_type) {
+        // Required empty public constructor
+        PH_Type=PH_type;
+    }
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         this.context = context;
     }
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        String databasepath = getContext().getDatabasePath("data_assignment.db").getPath();
+        // Open the SQLite database
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(databasepath, null, SQLiteDatabase.OPEN_READONLY);
+        // Query the database to get all rows from the "Pharmaceuticals" table
+        Cursor cursor = db.rawQuery(
+                "SELECT pharmaceuticals_type_medication FROM Pharmaceuticals WHERE pharmaceuticals_type ="
+                        +"'"
+                        +PH_Type
+                        +"'"
+                , null);
+        // Create a HashSet to store the unique pharmaceutical companies
+        pharmaceuticals_type_medication_Set = new HashSet<>();
+        // Loop through the cursor and add the values to the HashSet
+        if (cursor != null && cursor.getCount() > 0) {
+            if (cursor.moveToFirst()) {
+                do {
+                    @SuppressLint("Range") String company = cursor.getString(cursor.getColumnIndex("pharmaceuticals_type_medication"));
+                    pharmaceuticals_type_medication_Set.add(company);
+                } while (cursor.moveToNext());
+            }
+        }
+        // Convert the HashSet to an ArrayList if needed
+        pharmaceuticals_type_medication = new ArrayList<>(pharmaceuticals_type_medication_Set);
+        cursor.close();
+        db.close();
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
@@ -66,24 +100,20 @@ public class CabinetFragment extends Fragment implements CardNavigation {
     }
 
     private List<CardData> createShelfList() {
-        // Replace with real data
-        return Arrays.asList(
-                new CardData("Shelf 1", "Description 1", "Shelf"),
-                new CardData("Shelf 2", "Description 2", "Shelf"),
-                new CardData("Shelf 3", "Description 2", "Shelf"),
-                new CardData("Shelf 4", "Description 2", "Shelf")
-        );
+        // Replace with realdata
+        List<CardData>cardDataList=new ArrayList<>();
+        for(String value :pharmaceuticals_type_medication){
+            for (int i=0;i<1;i++){
+                cardDataList.add(new CardData("رف: "+value, PH_Type, "Shelf"));
+            }
+        }
+        return cardDataList;
+
     }
 
     @Override
     public void navigateToEditCardFragment(CardData cardData) {
-        Fragment editCardFragment = EditCardFragment.newInstance(cardData);
-        AppCompatActivity activity = (AppCompatActivity) context;
-        activity.getSupportFragmentManager().beginTransaction()
-                .replace(R.id.nav_host_fragment_content_main, editCardFragment)
-                .addToBackStack(null)
-                .commit();
-        hideRecyclerView();
+        Toast.makeText(requireContext(), "you can't edit this just edit name of medicine", Toast.LENGTH_SHORT).show();
     }
 
     private void showRecyclerView() {

@@ -12,14 +12,26 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/nav_gallery"
+        android:id="@+id/nav_companies"
         android:name="com.myprojects.assignment.ui.companies.CompaniesFragment"
-        android:label="@string/menu_gallery"
+        android:label="@string/menu_companies"
         tools:layout="@layout/fragment_companies" />
 
     <fragment
-        android:id="@+id/nav_slideshow"
+        android:id="@+id/nav_add_item"
+        android:name="com.myprojects.assignment.ui.additem.RunAddItemFragment"
+        android:label="@string/menu_add"
+        tools:layout="@layout/fragment_add_item" />
+
+    <fragment
+        android:id="@+id/nav_search"
         android:name="com.myprojects.assignment.ui.search.SearchFragment"
-        android:label="@string/menu_slideshow"
+        android:label="@string/menu_search"
         tools:layout="@layout/fragment_search" />
+
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="com.myprojects.assignment.ui.settings.SettingsFragment"
+        android:label="Settings"
+        tools:layout="@layout/fragment_settings" />
 </navigation>

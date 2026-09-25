@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -83,12 +84,6 @@ public class CompaniesFragment extends Fragment implements CardNavigation {
     }
 
     public void navigateToEditCardFragment(CardData cardData) {
-        Fragment editCardFragment = EditCardFragment.newInstance(cardData);
-        AppCompatActivity activity = (AppCompatActivity) context;
-        activity.getSupportFragmentManager().beginTransaction()
-                .replace(R.id.nav_host_fragment_content_main, editCardFragment)
-                .addToBackStack(null)
-                .commit();
-        hideRecyclerView();
+        Toast.makeText(requireContext(), "you can't edit this just edit name of medicine", Toast.LENGTH_SHORT).show();
     }
 }

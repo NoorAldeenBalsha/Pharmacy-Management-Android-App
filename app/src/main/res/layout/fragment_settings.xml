@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <Button
+        android:id="@+id/button_default_theme"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Default Theme"
+        android:backgroundTint="@color/purple_500"
+        android:textColor="@color/white" />
+
+
+    <Button
+        android:id="@+id/button_green_theme"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Green Theme"
+        android:backgroundTint="@color/green_500"
+        android:textColor="@color/white" />
+
+    <Button
+        android:id="@+id/button_red_theme"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Red Theme"
+        android:backgroundTint="@color/red_500"
+        android:textColor="@color/white" />
+
+    <Switch
+        android:id="@+id/switch_sound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:padding="8dp"
+        android:text="Sound" />
+
+
+</LinearLayout>

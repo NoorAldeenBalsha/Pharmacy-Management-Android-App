@@ -1,6 +1,9 @@
 package com.myprojects.assignment.ui.shelf;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -20,23 +23,60 @@ import com.myprojects.assignment.features.CardData;
 import com.myprojects.assignment.adapter.CardNavigation;
 import com.myprojects.assignment.ui.edit.EditCardFragment;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class ShelfFragment extends Fragment implements CardNavigation {
 
     private FragmentHomeBinding binding;
     private Context context;
 
+    List<String> pharmaceuticals_name;
+    Set<String> pharmaceuticals_name_Set;
+    String PH_Type_Medication;
+    String PH_Type;
 
+    public ShelfFragment(String PH_type_medication,String PH_type) {
+        // Required empty public constructor
+        PH_Type=PH_type;
+        PH_Type_Medication=PH_type_medication;
+    }
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         this.context = context;
     }
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        String databasepath = getContext().getDatabasePath("data_assignment.db").getPath();
+        // Open the SQLite database
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(databasepath, null, SQLiteDatabase.OPEN_READONLY);
+        // Query the database to get all rows from the "Pharmaceuticals" table
+        Cursor cursor = db.rawQuery(
+                "SELECT pharmaceuticals_name FROM Pharmaceuticals WHERE  pharmaceuticals_type ="
+                        +"'"
+                        +PH_Type
+                        +"'"
+                        +"AND pharmaceuticals_type_medication ="
+                        +"'"
+                        +PH_Type_Medication
+                        +"'"
+                        , null);
+        // Create a HashSet to store the unique pharmaceutical companies
+        pharmaceuticals_name_Set = new HashSet<>();
+        // Loop through the cursor and add the values to the HashSet
+        if (cursor != null && cursor.getCount() > 0) {
+            if (cursor.moveToFirst()) {
+                do {
+                    @SuppressLint("Range") String company = cursor.getString(cursor.getColumnIndex("pharmaceuticals_name"));
+                    pharmaceuticals_name_Set.add(company);
+                } while (cursor.moveToNext());
+            }
+        }
+        // Convert the HashSet to an ArrayList if needed
+        pharmaceuticals_name = new ArrayList<>(pharmaceuticals_name_Set);
+        // Close the cursor and database connection
+        cursor.close();
+        db.close();
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
@@ -67,10 +107,14 @@ public class ShelfFragment extends Fragment implements CardNavigation {
 
     private List<CardData> createShelfList() {
         // Replace with real data
-        return Arrays.asList(
-                new CardData("Shelf 1", "Description 1", "medicine"),
-                new CardData("Shelf 2", "Description 2", "medicine")
-        );
+        List<CardData>cardDataList=new ArrayList<>();
+        for(String value :pharmaceuticals_name){
+            for (int i=0;i<1;i++){
+                cardDataList.add(new CardData(value, "", "medicine"));
+            }
+        }
+        return cardDataList;
+
     }
 
     @Override

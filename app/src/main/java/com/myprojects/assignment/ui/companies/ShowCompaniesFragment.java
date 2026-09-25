@@ -1,13 +1,17 @@
 package com.myprojects.assignment.ui.companies;
 
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -21,11 +25,12 @@ import com.myprojects.assignment.features.CardData;
 import com.myprojects.assignment.ui.edit.EditCardFragment;
 import com.myprojects.assignment.ui.mypharma.MyPharmacyFragment;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class ShowCompaniesFragment extends Fragment implements CardNavigation {
     private RecyclerView cardRecyclerView;
+    List<String> pharmaceuticals_company;
+    Set<String> pharmaceuticals_company_Set;
 
     private Context context;
 
@@ -41,6 +46,28 @@ public class ShowCompaniesFragment extends Fragment implements CardNavigation {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        String databasepath = getContext().getDatabasePath("data_assignment.db").getPath();
+        // Open the SQLite database
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(databasepath, null, SQLiteDatabase.OPEN_READONLY);
+        // Query the database to get all rows from the "Pharmaceuticals" table
+        Cursor cursor = db.rawQuery
+                ("SELECT pharmaceuticals_company FROM Pharmaceuticals ", null);
+        // Create a HashSet to store the unique pharmaceutical companies
+        pharmaceuticals_company_Set = new HashSet<>();
+        // Loop through the cursor and add the values to the HashSet
+        if (cursor != null && cursor.getCount() > 0) {
+            if (cursor.moveToFirst()) {
+                do {
+                    @SuppressLint("Range") String company = cursor.getString(cursor.getColumnIndex("pharmaceuticals_company"));
+                    pharmaceuticals_company_Set.add(company);
+                } while (cursor.moveToNext());
+            }
+        }
+        // Convert the HashSet to an ArrayList if needed
+        pharmaceuticals_company = new ArrayList<>(pharmaceuticals_company_Set);
+        // Close the cursor and database connection
+        cursor.close();
+        db.close();
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
@@ -62,21 +89,18 @@ public class ShowCompaniesFragment extends Fragment implements CardNavigation {
 
     @Override
     public void navigateToEditCardFragment(CardData cardData) {
-        Fragment editCardFragment = EditCardFragment.newInstance(cardData);
-        AppCompatActivity activity = (AppCompatActivity) context;
-        activity.getSupportFragmentManager().beginTransaction()
-                .replace(R.id.nav_host_fragment_content_main, editCardFragment)
-                .addToBackStack(null)
-                .commit();
-        hideRecyclerView();
+        Toast.makeText(requireContext(), "you can't edit this just edit name of medicine", Toast.LENGTH_SHORT).show();
     }
 
     private List<CardData> createCardList() {
         // Replace with your actual data retrieval logic
-        return Arrays.asList(
-                new CardData("Company 1", "Description 1", "Company"),
-                new CardData("Company 2", "Description 2", "Company")
-        );
+        List<CardData>cardDataList=new ArrayList<>();
+        for(String value :pharmaceuticals_company){
+            for (int i=0;i<1;i++){
+                cardDataList.add(new CardData(value, "", "Company"));
+            }
+        }
+        return cardDataList;
     }
 
     @Override
